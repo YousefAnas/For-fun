@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>For My Queen 💖</title>
+<title>For Fun 💖</title>
 
 <style>
 *{
@@ -200,6 +200,44 @@ button{
 </head>
 <body>
 
+
+    
+
+    <div id="loginScreen" style="
+position:fixed;
+inset:0;
+background:#fff5f8;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:999999;
+">
+    <h1 style="color:#ff4f9a;margin-bottom:20px;">
+        💖 Enter Password 💖
+    </h1>
+
+    <input
+        id="passwordInput"
+        type="password"
+        placeholder="Password"
+        style="
+        padding:12px;
+        border-radius:12px;
+        border:1px solid #ccc;
+        width:260px;
+        margin-bottom:12px;
+        "
+    >
+
+    <button id="unlockBtn">Unlock ❤️</button>
+
+    <p id="errorText" style="color:#ff5252;margin-top:10px;"></p>
+</div>
+
+
+
+
 <img
     src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fyousefanas.github.io%2FFor-fun%2F&countColor=%23263759"
     alt=""
@@ -225,7 +263,7 @@ button{
 
 <div id="successOverlay">
     <div id="confetti"></div>
-    <h1>👑 I know my queen can pass anything 👑</h1>
+    <h1>👑 I know a queen can pass anything 👑</h1>
     <p>❤️ You're amazing ❤️</p>
 </div>
 
@@ -289,17 +327,18 @@ if (isMobile) {
     /* DODGE BUTTON */
     const badBtn = document.getElementById("notgood");
 
-    let mouseX = -9999;
-    let mouseY = -9999;
-
+    window.mouseX = -9999;
+    window.mouseY = -9999;
     let tx = 0;
     let ty = 0;
     let vx = 0;
     let vy = 0;
 
+    window.dodgeEnabled = false;
+
     document.addEventListener("mousemove", (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+        window.mouseX = e.clientX;
+        window.mouseY = e.clientY;
     });
 
     function keepInBounds(rect) {
@@ -324,13 +363,20 @@ if (isMobile) {
     }
 
     function animateDodge() {
+
+        if (!window.dodgeEnabled) {
+    requestAnimationFrame(animateDodge);
+    return;
+        }
+
+
         const rect = badBtn.getBoundingClientRect();
 
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
 
-        const dx = centerX - mouseX;
-        const dy = centerY - mouseY;
+        const dx = centerX - window.mouseX;
+        const dy = centerY - window.mouseY;
         const distance = Math.hypot(dx, dy);
 
         const dangerZone = 92;
@@ -352,6 +398,7 @@ if (isMobile) {
         keepInBounds(rect);
 
         badBtn.style.transform = `translate(${tx}px, ${ty}px)`;
+
 
         requestAnimationFrame(animateDodge);
     }
@@ -382,6 +429,114 @@ if (isMobile) {
     }
 }
 </script>
+
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+import {
+    getFirestore,
+    doc,
+    getDoc,
+    updateDoc
+}
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDaU9v1oRXG2ZvG6HtqxAYC2SjhiOewyIo",
+  authDomain: "for-fun-feead.firebaseapp.com",
+  projectId: "for-fun-feead",
+  storageBucket: "for-fun-feead.firebasestorage.app",
+  messagingSenderId: "186463176166",
+  appId: "1:186463176166:web:9521c72222dee0ecd1c227"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const loginScreen =
+document.getElementById("loginScreen");
+
+const unlockBtn =
+document.getElementById("unlockBtn");
+
+const passwordInput =
+document.getElementById("passwordInput");
+
+const errorText =
+document.getElementById("errorText");
+
+unlockBtn.addEventListener("click", async () => {
+
+    const pass = passwordInput.value.trim();
+
+    if(pass === "Jack_1290"){
+        window.mouseX = -9999;
+        window.mouseY = -9999;
+        window.dodgeEnabled = true;
+
+        loginScreen.style.display = "none";
+
+        return;
+            
+    }
+
+    if(pass === "Yara"){
+
+        const isMobile =
+        /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i
+        .test(navigator.userAgent);
+
+        if(isMobile){
+            errorText.textContent =
+            "Open on a computer ❤️";
+            return;
+        }
+
+        const ref =
+        doc(db,"siteState","guestAccess");
+
+        const snap =
+        await getDoc(ref);
+
+        const data =
+        snap.data();
+
+        if(data.used){
+            errorText.textContent =
+            "This password was already used ❤️";
+            return;
+        }
+
+        await updateDoc(ref,{
+            used:true,
+            usedBy:"Yara",
+            usedAt:new Date().toLocaleString()
+        });
+
+        window.mouseX = -9999;
+        window.mouseY = -9999;
+        window.dodgeEnabled = true;
+
+        loginScreen.style.display = "none";
+
+        return;
+        }
+
+    errorText.textContent =
+    "Wrong password ❤️";
+});
+
+passwordInput.addEventListener("keydown",(e)=>{
+    if(e.key==="Enter"){
+        unlockBtn.click();
+    }
+});
+
+</script>
+
 
 </body>
 </html>
